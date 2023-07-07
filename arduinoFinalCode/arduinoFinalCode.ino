@@ -6,14 +6,14 @@
 //Pin Initialization
 //hi
 //Untrasonic Pin Initialization
-int sugarTrigPin = 8;
-int sugarEchoPin = 9;
+int sugarTrigPin = 9;
+int sugarEchoPin = 8;
 
 int bioChipTrigPin = 11;
 int bioChipEchoPin = 10;
 
-int slakelimeTrigPin = 12;
-int slakelimeEchoPin = 13;
+int slakelimeTrigPin = 13;
+int slakelimeEchoPin = 12;
 
 //Buzzer Pin initialization
 int tonePin = 7;
@@ -152,7 +152,7 @@ byte colPins[COLS] = {33, 31, 29, 27}; //connect to the column pinouts of the ke
 // }
 
 void webBaseFunction(char command){
-  Serial.println("Web Based");
+  // Serial.println("Web Based");
   Serial.println(command);
   if(command == '1'){
     // TODO: Treatment functions
@@ -178,9 +178,12 @@ void webBaseFunction(char command){
         digitalWrite(bioChipLedPin, LOW);
         delay(1000);
       }
+      Serial1.print('z');
     }else{
       //To Do : Serial Communication
       webBaseFunction('3');
+      Serial1.print('a');
+      
     }
   }else if(command == '5'){
     // TODO: Treatment functions
@@ -190,16 +193,18 @@ void webBaseFunction(char command){
       Serial.println("Start Low PH Ultrasonic");
       lcd.setCursor(0, 0);
       lcd.print("Enter slakelime");
-      for(int i=0;i<1;i++){
+      for(int i=0;i<4;i++){
         buzzer(1000);
         digitalWrite(slakelimeLedPin, HIGH);
         delay(1000);
         digitalWrite(slakelimeLedPin, LOW);
         delay(1000);
       }
+      Serial1.print(4);
     }else{
       //To Do : Serial Communication
-      webBaseFunction('1');
+      // webBaseFunction('1');
+      Serial1.print(3);
     }
   }else if(command == '6'){
     // TODO: Treatment functions
@@ -209,24 +214,27 @@ void webBaseFunction(char command){
       Serial.println("Start High PH Ultrasonic");
       lcd.setCursor(0, 0);
       lcd.print("Enter sugar");
-      for(int i=0;i<1;i++){
+      for(int i=0;i<4;i++){
         buzzer(1000);
         digitalWrite(sugarLedPin, HIGH);
         delay(1000);
         digitalWrite(sugarLedPin, LOW);
         delay(1000);
       }
+      Serial1.print(6);
     }else{
       //To Do : Serial Communication
-      webBaseFunction('2');
+      // webBaseFunction('2');
+      Serial1.print(5);
     }
-  }else{
-    Serial.println("No threatment");
   }
+  // else{
+  //   Serial.println("No threatment");
+  // }
 }
 
 void keypadBaseFunction(){
-  Serial.println("Keypad Based");
+  // Serial.println("Keypad Based");
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Welcome");
@@ -270,7 +278,7 @@ void setup(){
 void loop(){
   if(Serial1.available()){
     char command = Serial1.read();
-    
+    // Serial.println(command);
     webBaseFunction(command);
   }else{
     keypadBaseFunction();
