@@ -134,6 +134,13 @@ byte colPins[COLS] = {33, 31, 29, 27}; //connect to the column pinouts of the ke
 //   return 0;
 // }
 
+// void relay(int relayPin, int delay) {
+//   digitalWrite(relayPin, HIGH);
+//   delay(delay);
+//   digitalWrite(relayPin, LOW);
+//   delay(delay);
+// }
+
 void webBaseFunction(char command){
   Serial.println("Web Based");
   Serial.println(command);
@@ -198,7 +205,7 @@ void webBaseFunction(char command){
       //To Do : Serial Communication
     }
   }else{
-    Serial.println("No threatment");
+    Serial.println("No treatment");
   }
 }
 
@@ -209,12 +216,71 @@ void keypadBaseFunction(){
   lcd.print("Welcome");
   delay(2000);
   lcd.clear();
+
   lcd.setCursor(0, 0);
   lcd.print("1.Water I/O");
   lcd.setCursor(4, 1);
   lcd.print("System");
   delay(5000);
   lcd.clear();
+
+  lcd.setCursor(0, 0);
+  lcd.print("2.Check PH");
+  delay(5000);
+  lcd.clear();
+
+  lcd.setCursor(0, 0);
+  lcd.print("3.Check NH3");
+  delay(5000);
+  lcd.clear();
+
+  lcd.setCursor(0, 0);
+  lcd.print("Enter your");
+  lcd.setCursor(0, 1);
+  lcd.print("choice:");
+  // delay(10000);
+  int key = keypad.getKey();
+  while (key == NO_KEY) {
+    key = keypad.getKey();
+  }
+  lcd.print(key - 48);
+  delay(2000);
+
+  if(key == 49){
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("1.Input water to");
+    lcd.setCursor(4, 1);
+    lcd.print("large tank");
+    delay(5000);
+    lcd.clear();
+
+    lcd.setCursor(0, 0);
+    lcd.print("2.Harvesting");
+    delay(5000);
+    lcd.clear();
+
+    lcd.setCursor(0, 0);
+    lcd.print("Enter your");
+    lcd.setCursor(0, 1);
+    lcd.print("choice:");
+    // delay(10000);
+    int key1 = keypad.getKey();
+    while (key1 == NO_KEY) {
+      key1 = keypad.getKey();
+    }
+    lcd.print(key1 - 48);
+    delay(2000);
+
+//TODO: Send number to nodemcu
+  }else if(key == 50){
+    //TODO: Send signal to start ph treatement
+  }else if(key==51){
+    //TODO: Start nh3 treatement 
+  }
+  
+
+
 }
 
 
