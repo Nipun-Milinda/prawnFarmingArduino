@@ -2,17 +2,18 @@
 #include <LiquidCrystal_I2C.h>
 #include <Keypad.h>
 
+
 //Pin Initialization
 //hi
 //Untrasonic Pin Initialization
-int sugarTrigPin = 8;
-int sugarEchoPin = 9;
+int sugarTrigPin = 9;
+int sugarEchoPin = 8;
 
-int bioChipTrigPin = 10;
-int bioChipEchoPin = 11;
+int bioChipTrigPin = 11;
+int bioChipEchoPin = 10;
 
-int slakelimeTrigPin = 12;
-int slakelimeEchoPin = 13;
+int slakelimeTrigPin = 13;
+int slakelimeEchoPin = 12;
 
 //Buzzer Pin initialization
 int tonePin = 7;
@@ -53,8 +54,10 @@ void Nema17Driver(int dirPin,int stepPin,int grams){
 bool isCanisterEmpty(int dis){
   int canisterEndPoint = 10; // need to check
   if(dis > canisterEndPoint){
+    Serial.println("True");
     return true;
   }else{
+    Serial.println("False");
     return false;
   }
 }
@@ -62,17 +65,31 @@ bool isCanisterEmpty(int dis){
 bool levelCheck(int trigPin, int echoPin) {
   int distance;
   long duration;
+  // int canisterEndPoint = 10; // need to check
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
   digitalWrite(trigPin, LOW);
   delayMicroseconds(50);
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(50);
   digitalWrite(trigPin, LOW);
 
+  pinMode(echoPin, INPUT); // Sets the echoPin as an Input
+
   duration = pulseIn(echoPin, HIGH);
   distance = duration * 0.034 / 2;
 
   Serial.println(distance);
+  // NewPing sonar(trigPin, echoPin, 400);
+  // int distance = sonar.ping_cm();
 
+  
+  // if(distance > canisterEndPoint){
+  //   Serial.println("True");
+  //   return 1;
+  // }else{
+  //   Serial.println("False");
+  //   return 0;
+  // }
   bool status = isCanisterEmpty(distance);
 
   return status;
@@ -142,7 +159,7 @@ byte colPins[COLS] = {33, 31, 29, 27}; //connect to the column pinouts of the ke
 // }
 
 void webBaseFunction(char command){
-  Serial.println("Web Based");
+  // Serial.println("Web Based");
   Serial.println(command);
   if(command == '1'){
     // TODO: Treatment functions
@@ -155,62 +172,80 @@ void webBaseFunction(char command){
     Serial.println("Start NH3 threatment");
   }else if(command == '4'){
     // TODO: Treatment functions
-    Serial.println("Start NH3 Ultrasonic");
-    if(levelCheck(bioChipTrigPin,bioChipEchoPin)){
+    
+    if(levelCheck(bioChipTrigPin, bioChipEchoPin)==true){
       //To Do : Serial Communication
+      Serial.println("Start NH3 Ultrasonic");
       lcd.setCursor(0, 0);
       lcd.print("Enter bioChip");
-      for(int i=0;i<15;i++){
+      for(int i=0;i<1;i++){
         buzzer(1000);
         digitalWrite(bioChipLedPin, HIGH);
         delay(1000);
         digitalWrite(bioChipLedPin, LOW);
         delay(1000);
       }
+      Serial1.print('z');
     }else{
       //To Do : Serial Communication
+      webBaseFunction('3');
+      Serial1.print('a');
+      
     }
   }else if(command == '5'){
     // TODO: Treatment functions
-    Serial.println("Start Low PH Ultrasonic");
-    if(levelCheck(slakelimeTrigPin,slakelimeEchoPin)){
+    
+    if(levelCheck(slakelimeTrigPin,slakelimeEchoPin)==true){
       //To Do : Serial Communication
+      Serial.println("Start Low PH Ultrasonic");
       lcd.setCursor(0, 0);
       lcd.print("Enter slakelime");
-      for(int i=0;i<15;i++){
+      for(int i=0;i<4;i++){
         buzzer(1000);
         digitalWrite(slakelimeLedPin, HIGH);
         delay(1000);
         digitalWrite(slakelimeLedPin, LOW);
         delay(1000);
       }
+      Serial1.print(4);
     }else{
       //To Do : Serial Communication
+      // webBaseFunction('1');
+      Serial1.print(3);
     }
   }else if(command == '6'){
     // TODO: Treatment functions
-    Serial.println("Start High PH Ultrasonic");
-    if(levelCheck(sugarTrigPin,sugarEchoPin)){
+    
+    if(levelCheck(sugarTrigPin,sugarEchoPin)==true){
       //To Do : Serial Communication
+      Serial.println("Start High PH Ultrasonic");
       lcd.setCursor(0, 0);
       lcd.print("Enter sugar");
-      for(int i=0;i<15;i++){
+      for(int i=0;i<4;i++){
         buzzer(1000);
         digitalWrite(sugarLedPin, HIGH);
         delay(1000);
         digitalWrite(sugarLedPin, LOW);
         delay(1000);
       }
+      Serial1.print(6);
     }else{
       //To Do : Serial Communication
+      // webBaseFunction('2');
+      Serial1.print(5);
     }
+
   }else{
     Serial.println("No treatment");
+
   }
+  // else{
+  //   Serial.println("No threatment");
+  // }
 }
 
 void keypadBaseFunction(){
-  Serial.println("Keypad Based");
+  // Serial.println("Keypad Based");
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Welcome");
@@ -272,11 +307,21 @@ void keypadBaseFunction(){
     lcd.print(key1 - 48);
     delay(2000);
 
-//TODO: Send number to nodemcu
-  }else if(key == 50){
+  //TODO: Send number to nodemcu
+
+    if(key1 == 49){
+     Serial1.print('b');
+    }else if(key == 50){
+     Serial1.print('c');
+    }
+
+    }else if(key == 50){
     //TODO: Send signal to start ph treatement
+     Serial1.print('d');
+     
   }else if(key==51){
-    //TODO: Start nh3 treatement 
+    //TODO: Start nh3 treatement
+     Serial1.print('e'); 
   }
   
 
@@ -304,13 +349,16 @@ void setup(){
   digitalWrite(43, HIGH); //Trun off relay channel
   digitalWrite(45, HIGH); //Trun off relay channel
 
+  
+  
+
 
 }
   
 void loop(){
   if(Serial1.available()){
     char command = Serial1.read();
-    
+    // Serial.println(command);
     webBaseFunction(command);
   }else{
     keypadBaseFunction();
