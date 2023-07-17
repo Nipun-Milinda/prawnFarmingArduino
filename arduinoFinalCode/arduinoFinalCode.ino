@@ -6,22 +6,22 @@
 //Pin Initialization
 //hi
 //Untrasonic Pin Initialization
-int sugarTrigPin = 9;
-int sugarEchoPin = 8;
+int sugarTrigPin = 13;
+int sugarEchoPin = 12;
 
-int bioChipTrigPin = 11;
-int bioChipEchoPin = 10;
+int bioChipTrigPin = 9;
+int bioChipEchoPin = 8;
 
-int slakelimeTrigPin = 13;
-int slakelimeEchoPin = 12;
+int slakelimeTrigPin = 11;
+int slakelimeEchoPin = 10;
 
 //Buzzer Pin initialization
 int tonePin = 7;
 
 //LED Pin initialization
-int sugarLedPin = 4;
+int sugarLedPin = 2;
 int bioChipLedPin = 3;
-int slakelimeLedPin = 2;
+int slakelimeLedPin = 4;
 
 
 //Buzzer Function
