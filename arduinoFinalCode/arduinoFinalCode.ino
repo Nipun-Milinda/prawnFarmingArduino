@@ -114,7 +114,7 @@ byte rowPins[ROWS] = {41, 39, 37, 35}; //connect to the row pinouts of the keypa
 byte colPins[COLS] = {33, 31, 29, 27}; //connect to the column pinouts of the keypad
 
 // //Create an object of keypad
-// Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
+Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 
 
 // //Keypad Function
@@ -151,25 +151,35 @@ byte colPins[COLS] = {33, 31, 29, 27}; //connect to the column pinouts of the ke
 //   return 0;
 // }
 
-// void relay(int relayPin, int delay) {
-//   digitalWrite(relayPin, HIGH);
-//   delay(delay);
-//   digitalWrite(relayPin, LOW);
-//   delay(delay);
-// }
+void relay(int relayPin) {
+  digitalWrite(relayPin, LOW);
+}
+
+void smallTankMixing(int dirr,int step,int grams){
+  Nema17Driver(dirr,step,grams);
+  relay(45); // dc motor
+  delay(120000);
+  digitalWrite(45, HIGH);
+  relay(43); //large pump
+  delay(15000); //need to check
+  digitalWrite(43, HIGH);
+}
 
 void webBaseFunction(char command){
   // Serial.println("Web Based");
   Serial.println(command);
   if(command == '1'){
     // TODO: Treatment functions
-    Serial.println("Start Low PH threatment");
+    // Serial.println("Start Low PH threatment");
+    smallTankMixing(A0,A1,40);
   }else if(command == '2'){
     // TODO: Treatment functions
-    Serial.println("Start High PH threatment");
+    // Serial.println("Start High PH threatment");
+    smallTankMixing(A2,A3,40);
   }else if(command == '3'){
     // TODO: Treatment functions
-    Serial.println("Start NH3 threatment");
+    // Serial.println("Start NH3 threatment");
+    smallTankMixing(A5,A6,40);
   }else if(command == '4'){
     // TODO: Treatment functions
     
@@ -189,7 +199,7 @@ void webBaseFunction(char command){
     }else{
       //To Do : Serial Communication
       webBaseFunction('3');
-      Serial1.print('a');
+      // Serial1.print('a');
       
     }
   }else if(command == '5'){
@@ -235,8 +245,12 @@ void webBaseFunction(char command){
       Serial1.print(5);
     }
 
-  }else{
-    Serial.println("No treatment");
+  }else if(command == '7'){
+    // Serial.println("No treatment");
+    lcd.setCursor(0,0);
+    lcd.print("You do not have");
+    lcd.setCursor(0,1);
+    lcd.print("any treatement");
 
   }
   // else{
@@ -274,6 +288,8 @@ void keypadBaseFunction(){
   lcd.setCursor(0, 1);
   lcd.print("choice:");
   // delay(10000);
+
+  //Ask for function
   int key = keypad.getKey();
   while (key == NO_KEY) {
     key = keypad.getKey();
@@ -310,18 +326,32 @@ void keypadBaseFunction(){
   //TODO: Send number to nodemcu
 
     if(key1 == 49){
-     Serial1.print('b');
+     Serial1.print('a');
     }else if(key == 50){
-     Serial1.print('c');
+     Serial1.print('b');
     }
 
     }else if(key == 50){
     //TODO: Send signal to start ph treatement
-     Serial1.print('d');
+     Serial1.print('c');
      
-  }else if(key==51){
+  }else if(key == 51){
     //TODO: Start nh3 treatement
-     Serial1.print('e'); 
+     lcd.setCursor(0,0);
+     lcd.print("Enter NH3 Value:");
+    //  Keypad();
+    //  lcd.clear();
+    //  lcd.setCursor(0,0);
+    //  lcd.print("NH3 Value:");
+    //  lcd.setCursor(11,0);
+    //  lcd.print(inputInt);
+    //  delay(2000);
+    //  lcd.clear();
+    //  lcd.setCursor(0,0);
+    //  lcd.print("Is it correct");
+
+
+     Serial1.print('d'); 
   }
   
 
@@ -332,7 +362,7 @@ void keypadBaseFunction(){
 void setup(){
   Serial.begin(9600);
   Serial1.begin(9600);
-  lcd.begin();
+  lcd.begin(16, 2);
   lcd.backlight();
   lcd.clear();
 
