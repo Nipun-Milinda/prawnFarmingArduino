@@ -4,7 +4,7 @@
 
 
 //Pin Initialization
-//hi
+
 //Untrasonic Pin Initialization
 int sugarTrigPin = 13;
 int sugarEchoPin = 12;
@@ -117,39 +117,48 @@ byte colPins[COLS] = {33, 31, 29, 27}; //connect to the column pinouts of the ke
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 
 
-// //Keypad Function
-// String inputString;
-// float inputInt;
+//Keypad Function
+String number = "";
+float floatValue = 0.0;
+bool numberEntered = false;
 
-// float Keypad() {
-//   char key = keypad.getKey();
+float KeypadFunction() {
+  char key = keypad.getKey();
 
-//   if (key) {
-//     //Serial.print(key);
+  if (key) {
+    if (key >= '0' && key <= '9') {
+      // Append the entered digit to the number
+      number += key;
 
-//     if (key >= '0' && key <= '9') {  // only act on numeric keys
-//       inputString += key;            // append new character to input string
-//     } else if (key == 'D') {
-//       inputString.concat('.');
-//     } else if (key == '#') {
-//       if (inputString.length() > 0) {
-//         inputInt = inputString.toFloat();  // YOU GOT AN INTEGER NUMBER
-//         inputString = "";                  // clear input
-//         // DO YOUR WORK HERE
-//         inputInt = inputInt;
-//         Serial.print(inputInt);
-//         Serial.print("\n");
-//         return inputInt;
-//       }
-//     } else if (key == '*') {
+      lcd.setCursor(0, 1);
+      lcd.print(number);
+    } else if (key == '#') {
+      // Number entry complete
+      floatValue = number.toFloat();
+      numberEntered = true;
+    } else if (key == 'C') {
+      // Clear the entered number
+      number = "";
 
-//       inputString = "";  // clear input
-//     }
+      lcd.setCursor(0, 1);
+      lcd.print("            ");
+    } else if (key == '*') {
+      // Print decimal point
+      number += ".";
+      
+      lcd.setCursor(0, 1);
+      lcd.print(number);
+    }
+  }
 
-//     // append new character to input string
-//   }
-//   return 0;
-// }
+  if (numberEntered) {
+    lcd.clear();
+    lcd.print("Entered number:");
+    lcd.setCursor(0, 1);
+    lcd.print(floatValue, 2);
+    numberEntered = false;
+  }
+}
 
 void relay(int relayPin) {
   digitalWrite(relayPin, LOW);
@@ -362,9 +371,9 @@ void keypadBaseFunction(){
 void setup(){
   Serial.begin(9600);
   Serial1.begin(9600);
-  lcd.begin(16, 2);
-  lcd.backlight();
+  lcd.init();
   lcd.clear();
+  lcd.backlight();
 
   //pin declare 
   pinMode(A0, OUTPUT); // Nema 1 DirPin 
