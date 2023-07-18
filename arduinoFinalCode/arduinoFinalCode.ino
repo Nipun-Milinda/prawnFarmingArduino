@@ -1,11 +1,14 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <Keypad.h>
+#include "NewPing.h"
 
 
 //Pin Initialization
 
 //Untrasonic Pin Initialization
+#define MAX_DISTANCE 400
+
 int sugarTrigPin = 13;
 int sugarEchoPin = 12;
 
@@ -14,6 +17,11 @@ int bioChipEchoPin = 8;
 
 int slakelimeTrigPin = 11;
 int slakelimeEchoPin = 10;
+
+NewPing sugar_sonar(sugarTrigPin, sugarEchoPin, MAX_DISTANCE);
+NewPing bioChip_sonar(bioChipTrigPin, bioChipEchoPin, MAX_DISTANCE);
+NewPing slakelime_sonar(slakelimeTrigPin, slakelimeEchoPin, MAX_DISTANCE);
+
 
 //Buzzer Pin initialization
 int tonePin = 7;
@@ -62,35 +70,19 @@ bool isCanisterEmpty(int dis){
   }
 }
 
-bool levelCheck(int trigPin, int echoPin) {
-  int distance;
-  long duration;
-  // int canisterEndPoint = 10; // need to check
-  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(50);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(50);
-  digitalWrite(trigPin, LOW);
+bool levelCheck(int data) {
+  if(data == 100){
+    //bioChip
+    bool status = isCanisterEmpty(bioChip_sonar.ping_cm());
+  }else if(data == 200){
+    //slakelime
+    bool status = isCanisterEmpty(slakelime_sonar.ping_cm());
+  }else if(data == 300){
+    //sugar
+    bool status = isCanisterEmpty(sugar_sonar.ping_cm());
+  }
 
-  pinMode(echoPin, INPUT); // Sets the echoPin as an Input
 
-  duration = pulseIn(echoPin, HIGH);
-  distance = duration * 0.034 / 2;
-
-  Serial.println(distance);
-  // NewPing sonar(trigPin, echoPin, 400);
-  // int distance = sonar.ping_cm();
-
-  
-  // if(distance > canisterEndPoint){
-  //   Serial.println("True");
-  //   return 1;
-  // }else{
-  //   Serial.println("False");
-  //   return 0;
-  // }
-  bool status = isCanisterEmpty(distance);
 
   return status;
 }
@@ -192,7 +184,7 @@ void webBaseFunction(char command){
   }else if(command == '4'){
     // TODO: Treatment functions
     
-    if(levelCheck(bioChipTrigPin, bioChipEchoPin)==true){
+    if(levelCheck(100)==true){
       //To Do : Serial Communication
       Serial.println("Start NH3 Ultrasonic");
       lcd.setCursor(0, 0);
@@ -214,7 +206,7 @@ void webBaseFunction(char command){
   }else if(command == '5'){
     // TODO: Treatment functions
     
-    if(levelCheck(slakelimeTrigPin,slakelimeEchoPin)==true){
+    if(levelCheck(200)==true){
       //To Do : Serial Communication
       Serial.println("Start Low PH Ultrasonic");
       lcd.setCursor(0, 0);
@@ -235,7 +227,7 @@ void webBaseFunction(char command){
   }else if(command == '6'){
     // TODO: Treatment functions
     
-    if(levelCheck(sugarTrigPin,sugarEchoPin)==true){
+    if(levelCheck(300)==true){
       //To Do : Serial Communication
       Serial.println("Start High PH Ultrasonic");
       lcd.setCursor(0, 0);
@@ -371,7 +363,7 @@ void keypadBaseFunction(){
 void setup(){
   Serial.begin(9600);
   Serial1.begin(9600);
-  lcd.init();
+  lcd.begin();
   lcd.clear();
   lcd.backlight();
 
