@@ -24,7 +24,7 @@ NewPing slakelime_sonar(slakelimeTrigPin, slakelimeEchoPin, MAX_DISTANCE);
 
 
 //Buzzer Pin initialization
-int tonePin = 7;
+int buzzerPin = 7;
 
 //LED Pin initialization
 int sugarLedPin = 2;
@@ -34,7 +34,7 @@ int slakelimeLedPin = 4;
 
 //Buzzer Function
 void buzzer(int delayVal) {
-  tone(tonePin, 500, 700);
+  tone(buzzerPin, 500, 700);
   delay(delayVal);
 }
 
@@ -62,10 +62,10 @@ void Nema17Driver(int dirPin,int stepPin,int grams){
 bool isCanisterEmpty(int dis){
   int canisterEndPoint = 10; // need to check
   if(dis > canisterEndPoint){
-    Serial.println("True");
+    // Serial.println("True");
     return true;
   }else{
-    Serial.println("False");
+    // Serial.println("False");
     return false;
   }
 }
@@ -73,18 +73,14 @@ bool isCanisterEmpty(int dis){
 bool levelCheck(int data) {
   if(data == 100){
     //bioChip
-    bool status = isCanisterEmpty(bioChip_sonar.ping_cm());
+    return isCanisterEmpty(bioChip_sonar.ping_cm());
   }else if(data == 200){
     //slakelime
-    bool status = isCanisterEmpty(slakelime_sonar.ping_cm());
+    return isCanisterEmpty(slakelime_sonar.ping_cm());
   }else if(data == 300){
     //sugar
-    bool status = isCanisterEmpty(sugar_sonar.ping_cm());
+    return isCanisterEmpty(sugar_sonar.ping_cm());
   }
-
-
-
-  return status;
 }
 
 
@@ -196,11 +192,11 @@ void webBaseFunction(char command){
         digitalWrite(bioChipLedPin, LOW);
         delay(1000);
       }
-      Serial1.print('z');
+      Serial1.print(2);
     }else{
       //To Do : Serial Communication
-      webBaseFunction('3');
-      // Serial1.print('a');
+      // webBaseFunction('3');
+      Serial1.print(1);
       
     }
   }else if(command == '5'){
@@ -376,20 +372,17 @@ void setup(){
   pinMode(A5, OUTPUT); // Nema 3 stepPin 
   pinMode(43, OUTPUT); // Small tank solinoid valve
   pinMode(45, OUTPUT); // water pump to small tank solinoid valve
+  pinMode(buzzerPin, OUTPUT);
 
   digitalWrite(43, HIGH); //Trun off relay channel
   digitalWrite(45, HIGH); //Trun off relay channel
-
-  
-  
-
 
 }
   
 void loop(){
   if(Serial1.available()){
     char command = Serial1.read();
-    // Serial.println(command);
+    Serial.println(command);
     webBaseFunction(command);
   }else{
     keypadBaseFunction();
